@@ -1,8 +1,6 @@
 # genkit-firebase-functions-slack-bolt-sample
 
-`genkit-firebase-functions-slack-bolt-sample` is your starting point for learning about Firebase Genkit, an open-source framework that helps developers create AI-powered applications. This sample project not only introduces you to the basics of Genkit but also guides you through the process of integrating Firebase Functions and Slack bolt app.
-
-TODO: slack bolt integration
+`genkit-firebase-functions-slack-bolt-sample` serves as an introductory guide to Firebase Genkit, an innovative open-source framework designed to empower developers in building AI-driven applications. This example project provides a comprehensive walkthrough on leveraging Genkit, alongside demonstrating the integration of Firebase Functions with a Slack Bolt application.
 
 - [Requirements](#requirements)
 - [Setup](#setup)
@@ -69,21 +67,19 @@ $ npm run genkit
 
 #### Setup
 
-Before utilizing Firebase Functions, ensure you have completed the following steps:
+Before deploying your application, complete the following preparatory steps:
 
-1. **Create a Firebase Project:**
+1. **Create a Firebase project**:
 
-   - Navigate to the [Firebase Console](https://console.firebase.google.com/).
-   - Click on "Add project" and follow the prompts to create a new Firebase project.
+Navigate to the Firebase Console. Click on `Create a project` and follow the prompts to create a new Firebase project.
 
-2. **Switch to the Blaze Plan:**
+2. **Switch to the Blaze plan**:
 
-   - Firebase Functions require the Blaze (pay-as-you-go) plan for deployment.
-   - In the Firebase Console, select your project, then navigate to the "Billing" section to change your plan.
+Firebase Functions require the `Blaze (Pay as you go) plan` for deployment. In the Firebase Console, select your project, then navigate to the left side bar section to change your plan.
 
-3. **Configure Your Firebase Project Locally:**
+3. **Configure your Firebase project locally**:
 
-   - Update the `.firebaserc` file in your project's root directory to include your Firebase project name:
+Update the .firebaserc file in your project's root directory to include your Firebase project name:
 
 ```json
 {
