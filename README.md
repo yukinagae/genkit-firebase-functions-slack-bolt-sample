@@ -1,6 +1,6 @@
 # genkit-firebase-functions-slack-bolt-sample
 
-`genkit-firebase-functions-slack-bolt-sample` serves as an introductory guide to Firebase Genkit, an innovative open-source framework designed to empower developers in building AI-driven applications. This example project provides a comprehensive walkthrough on leveraging Genkit, alongside demonstrating the integration of Firebase Functions with a Slack Bolt application.
+`genkit-firebase-functions-slack-bolt-sample` is a beginner-friendly guide to Firebase Genkit, an open-source framework for creating AI applications. This sample project offers a detailed tutorial on using Genkit and shows how to integrate Firebase Functions with a Slack Bolt app.
 
 - [Requirements](#requirements)
 - [Setup](#setup)
@@ -16,6 +16,7 @@ Before you start, make sure you have these installed:
 - **npm**
 - **Genkit**
 - **Firebase CLI**
+- **ngrok**
 
 For Genkit installation, see the [Firebase Genkit - Get started](https://firebase.google.com/docs/genkit/get-started).
 For Firebase CLI installation, see the [Firebase - Firebase CLI reference](https://firebase.google.com/docs/cli).
@@ -31,6 +32,8 @@ $ genkit --version # the below version is on my environment
 0.5.4
 $ firebase --version # the below version is on my environment
 13.13.0
+$ ngrok --version # the below version is on my environment
+ngrok version 3.3.0
 ```
 
 **Important**: Ensure all subsequent commands are executed within the `functions` directory. To navigate to this directory, use the command `cd functions` and verify your current working directory if necessary.
@@ -59,13 +62,7 @@ To start the Genkit server on your local machine and automatically open your def
 $ npm run genkit
 ```
 
-### Firebase Functions Quickstart
-
-- **Setup**: Initialize your project with Firebase.
-- **Local Emulator**: Test functions locally.
-- **Deploy**: Publish your functions.
-
-#### Setup
+#### Setup Your Firebase Project
 
 Before deploying your application, complete the following preparatory steps:
 
@@ -79,7 +76,7 @@ Firebase Functions require the `Blaze (Pay as you go) plan` for deployment. In t
 
 3. **Configure your Firebase project locally**:
 
-Update the .firebaserc file in your project's root directory to include your Firebase project name:
+Update the `.firebaserc` file in your project's root directory to include your Firebase project name:
 
 ```json
 {
@@ -89,19 +86,101 @@ Update the .firebaserc file in your project's root directory to include your Fir
 }
 ```
 
+#### Setup Your Slack App
+
+1. Navigate to [Slack - Your Apps](https://api.slack.com/apps) and click `Create New App`.
+2. Choose `From an app manifest` option, select a workspace under `Pick a workspace to develop your app`, and then click `Next`.
+3. In the app manifest JSON below, replace `[your_app_name]` with your app's name, paste the updated JSON, then proceed by clicking `Next` and `Create`.
+
+```json
+{
+  "display_information": {
+    "name": "[your_app_name]"
+  },
+  "features": {
+    "bot_user": {
+      "display_name": "[your_app_name]",
+      "always_online": true
+    }
+  },
+  "oauth_config": {
+    "scopes": {
+      "bot": [
+        "app_mentions:read",
+        "channels:history",
+        "chat:write",
+        "files:read"
+      ]
+    }
+  },
+  "settings": {
+    "event_subscriptions": {
+      "request_url": "http://dummy/events", // NOTE: replace this later
+      "bot_events": ["app_mention"]
+    },
+    "org_deploy_enabled": false,
+    "socket_mode_enabled": false,
+    "token_rotation_enabled": false
+  }
+}
+```
+
+4. Navigate to `Settings` and select `Install App`, then click `Install to Workspace` and `Allow` button.
+5. Your `Bot User OAuth Token` will appear. This is your `SLACK_BOT_TOKEN` for later use.
+6. Find your `Signing Secret` under `Basic Information`. This is your `SLACK_SIGNING_SECRET` for later use.
+7. To add your bot to a Slack channel, use the command:
+
+```bash
+/invite @[your_app_name]
+```
+
 #### Local Emulator
 
 To facilitate local development and testing of Firebase Functions, use the Firebase Emulator Suite. Follow these steps to run your functions locally:
 
-To run Firebase Functions locally using the emulator, set your OpenAI API key as an environment variable and start the emulator:
+To run Firebase Functions locally using the emulator, set your secret values in `functions/.secret.local`:
 
-TODO: `functions/.secret.local`
+```bash
+$ cp -p ./.secret.local.example ./secret.local
+$ vim ./secret.local # replace the secrets with your own values
+OPENAI_API_KEY=your_api_key
+SLACK_BOT_TOKEN=your_bot_token
+SLACK_SIGNING_SECRET=your_signing_secret
+```
+
+To launch the emulator, execute:
 
 ```bash
 $ npm run emulator
+✔  functions[us-central1-slack]: http function initialized (http://127.0.0.1:5001/[your_project_name]/us-central1/slack).
 ```
 
-TODO: slack integration
+To make your local emulator accessible online, use ngrok to forward port `5001`:
+
+```bash
+$ ngrok http 5001
+Forwarding https://[your_ngrok_id].ngrok-free.app -> http://localhost:5001
+```
+
+This command provides a public URL. Replace [your_ngrok_id] in the URL `https://[your_ngrok_id].ngrok-free.app` with the ID provided by ngrok.
+
+To configure Slack event subscriptions:
+
+1. Go to the `Event Subscriptions` page on your Slack app's dashboard.
+2. In the `Request URL` field, enter `https://[your_ngrok_id].ngrok.io/[your_project_name]/us-central1/slack/events`.
+3. Wait for the `Request URL Verified` confirmation, then click the `Save changes` button.
+
+To test in a Slack channel, mention your bot using `@[your_app_name]` followed by a URL, like so:
+
+```bash
+@[your_app_name] https://firebase.blog/posts/2024/04/next-announcements/
+```
+
+If everything is set up correctly, you should see a response summarizing the Firebase blog post:
+
+```text
+Cloud Next '24 showcased Firebase's updates: vector search for Firestore, new AI SDKs, Gemini features, and numerous sessions.
+```
 
 #### Deploy
 
@@ -111,7 +190,7 @@ To authenticate with Firebase and access your projects, use the Firebase CLI log
 $ firebase login
 ```
 
-To keep your OpenAI API key safe when using Firebase Functions, store it as a secret in GCP Secret Manger:
+To keep your secret keys safe when using Firebase Functions, store then as secret values in Google Cloud Secret Manger:
 
 ```bash
 $ firebase functions:secrets:set OPENAI_API_KEY
@@ -122,7 +201,7 @@ $ firebase functions:secrets:set SLACK_SIGNING_SECRET
 ? Enter a value for SLACK_SIGNING_SECRET [input is hidden]
 ```
 
-To confirm your OpenAI API key is correctly stored as a secret, use the following command:
+To confirm your secret keys are correctly stored as secrets, use the following command:
 
 ```bash
 $ firebase functions:secrets:access OPENAI_API_KEY
@@ -133,7 +212,7 @@ $ firebase functions:secrets:access SLACK_SIGNING_SECRET
 your_signing_secret
 ```
 
-After securing your API key, you're ready to deploy your application to Firebase Functions:
+After securing your secret keys, you're ready to deploy your application to Firebase Functions:
 
 ```bash
 $ npm run deploy
@@ -145,7 +224,21 @@ To monitor the behavior and troubleshoot your deployed functions, view the logs:
 $ npm run logs
 ```
 
-TODO: slack integration
+The final step involves linking your deployed function to the Slack app for integration.
+
+To configure Slack event subscriptions:
+
+1. Go to the `Event Subscriptions` page on your Slack app's dashboard.
+2. In the `Request URL` field, enter `https://summarizeflow-[your_function_id]-uc.a.run.app/events`.
+3. Wait for the `Request URL Verified` confirmation, then click the `Save changes` button.
+
+NOTE: Replace `[your_function_id]` with your Firebase project value, found in the Firebase Console under the Functions Dashboard.
+
+To test in a Slack channel, mention your bot using `@[your_app_name]` followed by a URL, like so:
+
+```bash
+@[your_app_name] https://firebase.blog/posts/2024/04/next-announcements/
+```
 
 ## Making Changes
 
