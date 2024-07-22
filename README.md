@@ -1,6 +1,6 @@
 # genkit-firebase-functions-slack-bolt-sample
 
-`genkit-firebase-functions-slack-bolt-sample` is a beginner-friendly guide to Firebase Genkit, an open-source framework for creating AI applications. This sample project offers a detailed tutorial on using Genkit and shows how to integrate Firebase Functions with a Slack Bolt app.
+`genkit-firebase-functions-slack-bolt-sample` is a beginner-friendly guide to Firebase Genkit, an open-source framework for creating AI applications. This sample project offers a detailed tutorial on using Firebase Genkit and shows how to integrate Firebase Functions with a Slack Bolt app.
 
 - [Requirements](#requirements)
 - [Setup](#setup)
@@ -62,7 +62,7 @@ To start the Genkit server on your local machine and automatically open your def
 $ npm run genkit
 ```
 
-#### Setup Your Firebase Project
+### Setup Your Firebase Project
 
 Before deploying your application, complete the following preparatory steps:
 
@@ -86,7 +86,7 @@ Update the `.firebaserc` file in your project's root directory to include your F
 }
 ```
 
-#### Setup Your Slack App
+### Setup Your Slack App
 
 1. Navigate to [Slack - Your Apps](https://api.slack.com/apps) and click `Create New App`.
 2. Choose `From an app manifest` option, select a workspace under `Pick a workspace to develop your app`, and then click `Next`.
@@ -134,7 +134,7 @@ Update the `.firebaserc` file in your project's root directory to include your F
 /invite @[your_app_name]
 ```
 
-#### Local Emulator
+### Local Emulator
 
 To facilitate local development and testing of Firebase Functions, use the Firebase Emulator Suite. Follow these steps to run your functions locally:
 
@@ -182,7 +182,7 @@ If everything is set up correctly, you should see a response summarizing the Fir
 Cloud Next '24 showcased Firebase's updates: vector search for Firestore, new AI SDKs, Gemini features, and numerous sessions.
 ```
 
-#### Deploy
+### Deploy
 
 To authenticate with Firebase and access your projects, use the Firebase CLI login command:
 
