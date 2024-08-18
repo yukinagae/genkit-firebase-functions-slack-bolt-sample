@@ -115,7 +115,7 @@ Update the `.firebaserc` file in your project's root directory to include your F
   },
   "settings": {
     "event_subscriptions": {
-      "request_url": "http://dummy/events", // NOTE: replace this later
+      "request_url": "http://dummy/events",
       "bot_events": ["app_mention"]
     },
     "org_deploy_enabled": false,
