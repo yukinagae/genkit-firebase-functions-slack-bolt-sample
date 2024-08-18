@@ -229,7 +229,7 @@ The final step involves linking your deployed function to the Slack app for inte
 To configure Slack event subscriptions:
 
 1. Go to the `Event Subscriptions` page on your Slack app's dashboard.
-2. In the `Request URL` field, enter `https://summarizeflow-[your_function_id]-uc.a.run.app/events`.
+2. In the `Request URL` field, enter `https://slack-[your_function_id]-uc.a.run.app/events`.
 3. Wait for the `Request URL Verified` confirmation, then click the `Save changes` button.
 
 NOTE: Replace `[your_function_id]` with your Firebase project value, found in the Firebase Console under the Functions Dashboard.

@@ -6,6 +6,7 @@ import * as cheerio from 'cheerio'
 import { onRequest } from 'firebase-functions/v2/https'
 import { gpt4o, openAI } from 'genkitx-openai'
 import * as z from 'zod'
+import { verifySignature } from './verification'
 
 // Configure Genkit with necessary plugins and settings
 configureGenkit({
@@ -96,6 +97,12 @@ function createReceiver() {
 export const slack = onRequest(
   { secrets: ['OPENAI_API_KEY', 'SLACK_BOT_TOKEN', 'SLACK_SIGNING_SECRET'] },
   async (req, res) => {
+    // verify the request is from slack
+    if (!verifySignature(req, process.env.SLACK_SIGNING_SECRET || '')) {
+      res.status(400).send('Request verification failed')
+      return
+    }
+
     return createReceiver().app(req, res)
   },
 )

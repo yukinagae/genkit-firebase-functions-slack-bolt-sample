@@ -9,11 +9,12 @@
   },
   "scripts": {
     "build": "tsc",
+    "watch": "tsc --watch",
     "typecheck": "tsc --noEmit",
     "check": "biome check ./src",
     "fix": "biome check --write ./src",
     "genkit": "genkit start -o",
-    "emulator": "npm run build && GENKIT_ENV=dev firebase emulators:start --inspect-functions",
+    "emulator": "npm run watch & GENKIT_ENV=dev firebase emulators:start --inspect-functions",
     "deploy": "npm run build && firebase deploy --only functions",
     "logs": "firebase functions:log"
   },
