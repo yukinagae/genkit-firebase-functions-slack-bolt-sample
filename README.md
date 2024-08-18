@@ -126,7 +126,7 @@ Update the `.firebaserc` file in your project's root directory to include your F
 ```
 
 4. Navigate to `Settings` and select `Install App`, then click `Install to Workspace` and `Allow` button.
-5. Your `Bot User OAuth Token` will appear. This is your `SLACK_BOT_TOKEN` for later use.
+5. Find your `Bot User OAuth Token` under `OAuth & Permissions`. This is your `SLACK_BOT_TOKEN` for later use.
 6. Find your `Signing Secret` under `Basic Information`. This is your `SLACK_SIGNING_SECRET` for later use.
 7. To add your bot to a Slack channel, use the command:
 
@@ -173,13 +173,13 @@ To configure Slack event subscriptions:
 To test in a Slack channel, mention your bot using `@[your_app_name]` followed by a URL, like so:
 
 ```bash
-@[your_app_name] https://firebase.blog/posts/2024/04/next-announcements/
+@[your_app_name] hello
 ```
 
-If everything is set up correctly, you should see a response summarizing the Firebase blog post:
+If everything is set up correctly, you should see a response like this:
 
 ```text
-Cloud Next '24 showcased Firebase's updates: vector search for Firestore, new AI SDKs, Gemini features, and numerous sessions.
+Hello! How can I assist you today?
 ```
 
 ### Deploy
@@ -237,7 +237,7 @@ NOTE: Replace `[your_function_id]` with your Firebase project value, found in th
 To test in a Slack channel, mention your bot using `@[your_app_name]` followed by a URL, like so:
 
 ```bash
-@[your_app_name] https://firebase.blog/posts/2024/04/next-announcements/
+@[your_app_name] hello
 ```
 
 ## Making Changes
