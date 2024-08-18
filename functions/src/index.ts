@@ -1,8 +1,7 @@
-import { defineTool, generate } from '@genkit-ai/ai'
+import { generate } from '@genkit-ai/ai'
 import { configureGenkit } from '@genkit-ai/core'
 import { defineFlow, runFlow } from '@genkit-ai/flow'
 import { App, ExpressReceiver } from '@slack/bolt'
-import * as cheerio from 'cheerio'
 import { onRequest } from 'firebase-functions/v2/https'
 import { gpt4o, openAI } from 'genkitx-openai'
 import * as z from 'zod'
@@ -15,35 +14,18 @@ configureGenkit({
   enableTracingAndMetrics: true, // Perform OpenTelemetry instrumentation and enable trace collection.
 })
 
-// Tool definition for loading web content
-const webLoader = defineTool(
+// Flow definition to answer a question
+const answerFlow = defineFlow(
   {
-    name: 'webLoader',
-    description: 'Loads a webpage and returns the textual content.',
-    inputSchema: z.object({ url: z.string() }),
-    outputSchema: z.string(),
-  },
-  async ({ url }) => {
-    const res = await fetch(url) // Fetch the content from the provided URL
-    const html = await res.text()
-    const $ = cheerio.load(html) // Load the HTML content into Cheerio for parsing
-    $('script, style, noscript').remove() // Remove unnecessary elements
-    return $('article').length ? $('article').text() : $('body').text() // Prefer 'article' content, fallback to 'body' if not available
-  },
-)
-
-// Flow definition for summarizing web content
-const summarizeFlow = defineFlow(
-  {
-    name: 'summarizeFlow',
+    name: 'answerFlow',
     inputSchema: z.string(),
     outputSchema: z.string(),
   },
-  async (url: string) => {
+  async (question: string) => {
     const llmResponse = await generate({
-      prompt: `First, fetch this link: "${url}". Then, summarize the content within 20 words.`,
+      prompt: `You are a helpful AI assistant. You are asked: ${question}`,
       model: gpt4o, // Specify the model to use for generation
-      tools: [webLoader], // Include the webLoader tool defined earlier for fetching webpage content
+      tools: [],
       config: {
         temperature: 1, // Set the creativity/variation of the response
       },
@@ -82,7 +64,7 @@ function createReceiver() {
     if (!botMessage.ts) return // skip if failed to send message
 
     const input = rawInput.replace(/<@.*?>/, '').trim() // delete mention
-    const answer = await runFlow(summarizeFlow, input) // run the flow to generate an answer
+    const answer = await runFlow(answerFlow, input) // run the flow to get the answer
     console.log('💖answer', answer)
 
     await client.chat.update({

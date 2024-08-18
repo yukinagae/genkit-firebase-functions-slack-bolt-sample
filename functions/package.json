@@ -24,7 +24,6 @@
     "@genkit-ai/firebase": "^0.5.4",
     "@genkit-ai/flow": "^0.5.4",
     "@slack/bolt": "^3.19.0",
-    "cheerio": "1.0.0-rc.12",
     "express": "^4.19.2",
     "firebase-functions": "^5.0.1",
     "genkitx-openai": "^0.10.0",
