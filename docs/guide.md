@@ -23,6 +23,82 @@ Please clone the repository locally in advance. By using this code as is, you sh
 $ git clone https://github.com/yukinagae/genkit-firebase-functions-slack-bolt-sample.git
 ```
 
+## Code Explanation
+
+The only code you need to look at is `functions/src/index.ts`. Overall, it's about 100 lines, but excluding imports and configuration, the main processing is as follows.
+
+```typescript
+// Flow definition to answer a question
+const answerFlow = defineFlow(
+  {
+    name: "answerFlow",
+    inputSchema: z.string(),
+    outputSchema: z.string(),
+  },
+  async (question: string) => {
+    const llmResponse = await generate({
+      prompt: `You are a helpful AI assistant. You are asked: ${question}`,
+      model: gpt4o, // Specify the model to use for generation
+      tools: [],
+      config: {
+        temperature: 1, // Set the creativity/variation of the response
+      },
+    });
+    return llmResponse.text();
+  }
+);
+
+// Create a slack receiver
+function createReceiver() {
+  const receiver = new ExpressReceiver({
+    signingSecret: process.env.SLACK_SIGNING_SECRET || "",
+    endpoints: "/events",
+    processBeforeResponse: true,
+  });
+
+  const app = new App({
+    receiver: receiver,
+    token: process.env.SLACK_BOT_TOKEN,
+    processBeforeResponse: true,
+  });
+
+  app.event("app_mention", async ({ event, context, client, say }) => {
+    const { bot_id: botId, text: rawInput, channel } = event;
+    const { retryNum } = context;
+    const ts = event.thread_ts || event.ts;
+
+    if (retryNum) return; // skip if retry
+    if (botId) return; // skip if bot mentions itself
+
+    // thinking...
+    const botMessage = await say({
+      thread_ts: ts,
+      text: "typing...",
+    });
+    if (!botMessage.ts) return; // skip if failed to send message
+
+    const input = rawInput.replace(/<@.*?>/, "").trim(); // delete mention
+    const answer = await runFlow(answerFlow, input); // run the flow to get the answer
+
+    await client.chat.update({
+      channel,
+      ts: botMessage.ts as string,
+      text: answer,
+    });
+  });
+  return receiver;
+}
+
+export const slack = onRequest(
+  { secrets: ["OPENAI_API_KEY", "SLACK_BOT_TOKEN", "SLACK_SIGNING_SECRET"] },
+  async (req, res) => {
+    return createReceiver().app(req, res);
+  }
+);
+```
+
+Let's actually run it!
+
 ## Prerequisites
 
 Ensure the following are installed:
