@@ -170,7 +170,7 @@ To configure Slack event subscriptions:
 2. In the `Request URL` field, enter `https://[your_ngrok_id].ngrok-free.app/[your_project_name]/us-central1/slack/events`.
 3. Wait for the `Request URL Verified` confirmation, then click the `Save changes` button.
 
-To test in a Slack channel, mention your bot using `@[your_app_name]` followed by a URL, like so:
+To test in a Slack channel, mention your bot using `@[your_app_name]` followed by a greeting message, like so:
 
 ```bash
 @[your_app_name] hello
@@ -234,7 +234,7 @@ To configure Slack event subscriptions:
 
 NOTE: Replace `[your_function_id]` with your Firebase project value, found in the Firebase Console under the Functions Dashboard.
 
-To test in a Slack channel, mention your bot using `@[your_app_name]` followed by a URL, like so:
+To test in a Slack channel, mention your bot using `@[your_app_name]` followed by a greeting message, like so:
 
 ```bash
 @[your_app_name] hello
