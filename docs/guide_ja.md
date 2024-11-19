@@ -29,14 +29,14 @@ $ git clone https://github.com/yukinagae/genkit-firebase-functions-slack-bolt-sa
 
 ```typescript
 // Flow definition to answer a question
-const answerFlow = defineFlow(
+const answerFlow = ai.defineFlow(
   {
     name: "answerFlow",
     inputSchema: z.string(),
     outputSchema: z.string(),
   },
   async (question: string) => {
-    const llmResponse = await generate({
+    const llmResponse = await ai.generate({
       prompt: `You are a helpful AI assistant. You are asked: ${question}`,
       model: gpt4o, // Specify the model to use for generation
       tools: [],
@@ -44,7 +44,7 @@ const answerFlow = defineFlow(
         temperature: 1, // Set the creativity/variation of the response
       },
     });
-    return llmResponse.text();
+    return llmResponse.text;
   }
 );
 
@@ -78,7 +78,7 @@ function createReceiver() {
     if (!botMessage.ts) return; // skip if failed to send message
 
     const input = rawInput.replace(/<@.*?>/, "").trim(); // delete mention
-    const answer = await runFlow(answerFlow, input); // run the flow to get the answer
+    const answer = await answerFlow(input); // run the flow to get the answer
 
     await client.chat.update({
       channel,

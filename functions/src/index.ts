@@ -1,28 +1,28 @@
-import { generate } from '@genkit-ai/ai'
-import { configureGenkit } from '@genkit-ai/core'
-import { defineFlow, runFlow } from '@genkit-ai/flow'
+import { genkit, z } from 'genkit'
+
 import { App, ExpressReceiver } from '@slack/bolt'
 import { onRequest } from 'firebase-functions/v2/https'
 import { gpt4o, openAI } from 'genkitx-openai'
-import * as z from 'zod'
 import { verifySignature } from './verification'
 
+// Log debug output to the console.
+import { logger } from 'genkit/logging'
+logger.setLogLevel('debug')
+
 // Configure Genkit with necessary plugins and settings
-configureGenkit({
+const ai = genkit({
   plugins: [openAI({ apiKey: process.env.OPENAI_API_KEY })], // Use the OpenAI plugin with the provided API key.
-  logLevel: 'debug', // Log debug output to the console.
-  enableTracingAndMetrics: true, // Perform OpenTelemetry instrumentation and enable trace collection.
 })
 
 // Flow definition to answer a question
-const answerFlow = defineFlow(
+const answerFlow = ai.defineFlow(
   {
     name: 'answerFlow',
     inputSchema: z.string(),
     outputSchema: z.string(),
   },
   async (question: string) => {
-    const llmResponse = await generate({
+    const llmResponse = await ai.generate({
       prompt: `You are a helpful AI assistant. You are asked: ${question}`,
       model: gpt4o, // Specify the model to use for generation
       tools: [],
@@ -30,7 +30,7 @@ const answerFlow = defineFlow(
         temperature: 1, // Set the creativity/variation of the response
       },
     })
-    return llmResponse.text()
+    return llmResponse.text
   },
 )
 
@@ -64,7 +64,7 @@ function createReceiver() {
     if (!botMessage.ts) return // skip if failed to send message
 
     const input = rawInput.replace(/<@.*?>/, '').trim() // delete mention
-    const answer = await runFlow(answerFlow, input) // run the flow to get the answer
+    const answer = await answerFlow(input) // run the flow to get the answer
     console.log('💖answer', answer)
 
     await client.chat.update({

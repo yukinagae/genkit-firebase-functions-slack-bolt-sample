@@ -148,6 +148,7 @@ dist
 
 # genkit
 lib
+.genkit
 
 # firebase emulator
 .secret.local
